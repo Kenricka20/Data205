@@ -1,0 +1,70 @@
+---
+title: "EV DATASET"
+author: "Kenrick"
+date: "2023-09-18"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(dplyr)
+```
+
+```{r}
+# Set a working directory
+setwd("/Users/tangangkenrickakere/Desktop/Datasets")
+
+```
+
+# Questions for EV Project.
+
+##1. What regions in the world have the highest EV vehicle sales in the world? 
+
+```{r}
+# Load the data
+ev_data <- read.csv("IEA-EV-dataEV stockHistoricalCars.csv")
+```
+
+```{r}
+# Group the EV data by region
+ev_data_grouped <- group_by(ev_data, region)
+```
+
+```{r}
+# Get the total EV sales for each region
+region_sales <- ev_data %>%
+  group_by(region) %>%
+  summarise(ev_sales = sum(BEV + PHEV))
+```
+```{r}
+ev_data <- ev_data %>%
+  mutate(BEV = EV_stock_Cars + EV_sales_Cars)
+```
+
+```{r}
+# Select the top 10 regions with the highest EV population
+top_10_regions <- ev_population_sorted[1:10]
+```
+
+How many EVSE chargers are in the metropolitan areas? 
+What amount of EVSE chargers are going to be needed to satisfy the current EV vehicle population? 
+What is the total EV vehicle population in Maryland? 
+What does the growth in the population of both EV and Plug-in Vehicles from 2020 to 2023 across all the counties in Maryland look like? 
+What is the percentage growth in Montgomery County alone?  
+Calculate the current growth rate. 
+Produce a prediction model to see the expected EV population by 2035. 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
