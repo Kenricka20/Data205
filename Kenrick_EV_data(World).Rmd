@@ -8,6 +8,7 @@ output: html_document
 ```{r}
 library(tidyverse)
 library(dplyr)
+library(ggplot2)
 ```
 
 ```{r}
@@ -26,19 +27,45 @@ ev_data <- read.csv("IEA-EV-dataEV stockHistoricalCars.csv")
 ```
 
 ```{r}
-# Group the EV data by region
-ev_data_grouped <- group_by(ev_data, region)
+# Get the total EV sales for each region
+counts_region <- table(ev_data$region)
+print(counts_region)
 ```
 
 ```{r}
-# Get the total EV sales for each region
-region_sales <- ev_data %>%
-  group_by(region) %>%
-  summarise(ev_sales = sum(BEV + PHEV))
+# Convert counts_country to a data frame to be able to create a visualization
+counts_region_df <- as.data.frame(counts_region)
+names(counts_region_df) <- c("region", "total_count")
+```
+
+```{r}
+# Create a bar plot using ggplot2
+ggplot(counts_region_df, aes(x = region, y = total_count)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  labs(x = "region", y = "total_count", title = "Total Count of Each Region") +
+  theme_minimal()
 ```
 ```{r}
-ev_data <- ev_data %>%
-  mutate(BEV = EV_stock_Cars + EV_sales_Cars)
+# Sort the data frame by total_count in descending order and select top 5 rows
+top_countries <- head(counts_region_df[order(-counts_region_df$total_count), ], 10)
+```
+
+```{r}
+# Create a bar plot for the top 10 countries
+ggplot(top_countries, aes(x = reorder(region, -total_count), y = total_count)) +
+  geom_bar(stat = "identity", fill = "red") +
+  labs(x = "Region", y = "Total Count", title = "Top 10 Regions by Total Count") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels for better visibility
+
+
+```
+
+
+```{r}
+#Count the type of electric vehicles in the dataset
+counts_powertrain <- table(ev_data$powertrain)
+print(counts_powertrain)
 ```
 
 ```{r}
