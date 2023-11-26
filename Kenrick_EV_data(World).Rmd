@@ -60,12 +60,88 @@ ggplot(top_countries, aes(x = reorder(region, -total_count), y = total_count)) +
 
 
 ```
+## There are some bars in the above visualization that make my visualization look wierd, so I am taking them out below to make it make more sense.
+
+```{r}
+# Filter out specified countries from top_countries dataset
+filtered_countries <- subset(top_countries, !(region %in% c("Europe", "World", "Rest of the world", "EU27")))
+
+```
+
+```{r}
+# Create a bar plot for the top 10 countries (excluding specified countries)
+ggplot(filtered_countries, aes(x = reorder(region, -total_count), y = total_count)) +
+  geom_bar(stat = "identity", fill = "grey") +
+  labs(x = "Region", y = "Total Count", title = "Top 10 Regions by Total Count") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels for better visibility
+
+```
+## Ensure that the units are represented in millions
+```{r}
+# Create a bar plot with values in millions on the y-axis
+library(scales)  # Required for formatting labels
+
+# Create a bar plot for the top 10 countries (excluding specified countries) with y-axis labels in millions
+ggplot(filtered_countries, aes(x = reorder(region, -total_count), y = total_count)) +
+  geom_bar(stat = "identity", fill = "grey") +
+  labs(x = "Region", y = "Total Count (Millions)", title = "Top 10 Regions by Total Count") +
+  scale_y_continuous(labels = label_number_si(scale = 1e-6, suffix = "M")) +  # Format y-axis labels in millions
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels for better visibility
+
+```
+
+
+```{r}
+library(ggplot2)
+
+# Create a bar plot for the top 10 countries (excluding specified countries) with log10 scale
+ggplot(filtered_countries, aes(x = reorder(region, -total_count), y = total_count)) +
+  geom_bar(stat = "identity", fill = "grey") +
+  labs(x = "Region", y = "Total Count (log10 scale)", title = "Top 10 Regions by Total Count") +
+  scale_y_continuous(trans = "log10") +  # Set y-axis scale to log10
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels for better visibility
+
+```
+
+```{r}
+library(ggplot2)
+
+# Create a bar plot for the top 10 countries (excluding specified countries)
+ggplot(filtered_countries, aes(x = reorder(region, -total_count), y = total_count)) +
+  geom_bar(stat = "identity", fill = "grey") +
+  labs(x = "Region", y = "Total Count", title = "Top 10 Regions by Total Count") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  # Rotate x-axis labels for better visibility
+  scale_y_continuous(labels = function(x) paste(x / 100000, "hundreds of thousands"))  # Modify y-axis labels
+
+```
 
 
 ```{r}
 #Count the type of electric vehicles in the dataset
 counts_powertrain <- table(ev_data$powertrain)
 print(counts_powertrain)
+```
+
+```{r}
+library(ggplot2)
+
+# Count the type of electric vehicles in the dataset
+counts_powertrain <- table(ev_data$powertrain)
+
+# Convert the counts to a data frame
+counts_df <- data.frame(powertrain = names(counts_powertrain), count = as.numeric(counts_powertrain))
+
+# Create a line graph
+ggplot(counts_df, aes(x = powertrain, y = count, group = 1)) +
+  geom_line(color = "blue") +
+  geom_point(color = "red", size = 3) +
+  labs(x = "Powertrain Type", y = "Count", title = "Count of Electric Vehicle Types") +
+  theme_minimal()
+
 ```
 
 ```{r}
