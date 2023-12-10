@@ -15,6 +15,9 @@ library(ggplot2)
 # Set a working directory
 setwd("/Users/tangangkenrickakere/Desktop/Datasets")
 
+# Load data
+charging_station <- read_csv("")
+
 ```
 
 # Questions for EV Project.
@@ -69,10 +72,10 @@ filtered_countries <- subset(top_countries, !(region %in% c("Europe", "World", "
 ```
 
 ```{r}
-# Create a bar plot for the top 10 countries (excluding specified countries)
+# Create a bar plot for the top 6 countries (excluding specified countries)
 ggplot(filtered_countries, aes(x = reorder(region, -total_count), y = total_count)) +
   geom_bar(stat = "identity", fill = "grey") +
-  labs(x = "Region", y = "Total Count", title = "Top 10 Regions by Total Count") +
+  labs(x = "Regions", y = "Total Count", title = "Top 6 Regions in the world") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels for better visibility
 
@@ -144,19 +147,6 @@ ggplot(counts_df, aes(x = powertrain, y = count, group = 1)) +
 
 ```
 
-```{r}
-# Select the top 10 regions with the highest EV population
-top_10_regions <- ev_population_sorted[1:10]
-```
-
-How many EVSE chargers are in the metropolitan areas? 
-What amount of EVSE chargers are going to be needed to satisfy the current EV vehicle population? 
-What is the total EV vehicle population in Maryland? 
-What does the growth in the population of both EV and Plug-in Vehicles from 2020 to 2023 across all the counties in Maryland look like? 
-What is the percentage growth in Montgomery County alone?  
-Calculate the current growth rate. 
-Produce a prediction model to see the expected EV population by 2035. 
- 
 
 
 
