@@ -1,0 +1,126 @@
+---
+title: "Linear Regression(EV_capstone)"
+author: "Kenrick"
+date: "2023-12-04"
+output: html_document
+---
+# Data Story
+### This report investigates the factors influencing electric vehicle (EV) adoption across various counties in the United States, specifically Maryland. Utilizing a combination of linear regression modeling and data visualization, I analyzed the relationships between EV count, median household income, total population, and average travel time to work. My findings reveal significant associations between these factors, with higher income and population leading to more EVs, while longer commute times seem to discourage adoption. The model explains approximately 70% of the variance, prompting further exploration of other potential drivers and refining the analysis for deeper insights. 
+
+```{r}
+# Load libraries
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(psych)
+library(sf)
+
+```
+
+
+```{r}
+# Set a working directory
+setwd("/Users/tangangkenrickakere/Desktop/Datasets")
+
+ev_mdot_data <- read.csv("Capstone Data.csv") 
+```
+
+# Exploratory Data Analysis
+```{r}
+summary(ev_mdot_data)
+```
+
+
+```{r}
+describe(ev_mdot_data)
+```
+
+```{r}
+# View some histograms
+  ggplot(data = ev_mdot_data, aes(x = EV.Growth.rate)) +
+  geom_histogram()
+```
+### Produce a boxplot that displays the distribution of Growth.rate for each County in the ev_mdot_data DataFrame
+
+```{r}
+ggplot(data = ev_mdot_data, aes(x = County, y = Total.Population)) +
+  geom_boxplot() +
+ theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels for better visibility
+
+```
+```{r}
+ggplot(data = ev_mdot_data, aes(x = County, y = EV.Growth.rate)) +
+  geom_boxplot() +
+ theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels for better visibility
+
+```
+
+```{r}
+# Building a simple linear regression model
+model <- lm(Number.of.Vehicles ~ Median.Household.Income + Total.Population + Average.Travel.Time.to.Work, data = ev_mdot_data)
+# Summarize model fit and coefficients
+summary(model)
+```
+### The output above shows the results of fitting a linear regression model to predict the number of electric vehicles (EVs) in a county based on three independent variables:
+
+#### Median.Household.Income: Median household income in the county
+#### Total.Population: Total population of the county
+#### Average.Travel.Time.to.Work: Average travel time to work in minutes
+
+### Here's a breakdown of what the output tells you:
+
+### Data Summary:
+
+#### The table shows descriptive statistics for the seven variables included in the analysis. You can see the range, quartiles, and mean values for each variable.
+
+### Regression Model:
+
+#### The call statement shows the formula used for the regression: Number.of.Vehicles ~ Median.Household.Income + Total.Population + Average.Travel.Time.to.Work. This means we're trying to explain variations in the number of EVs based on these three factors. The residuals summary indicates how well the model fits the data. The minimum, quartiles, and maximum values of the residuals show how much the actual EV counts deviate from the model's predictions. The coefficients table shows the estimated impact of each independent variable on EV count. For example, a $1000 increase in median household income is associated with an estimated 0.98 additional EV, while a one-minute increase in average travel time is associated with about 2.4 fewer EVs. The p-values for each coefficient tell you how likely it is that these relationships are due to chance (lower p-values indicate stronger evidence for a real association). The R-squared values (0.74 and 0.70) suggest that the model explains about 70% of the variance in EV counts based on these three factors. However, the F-statistic and its p-value also confirm this statistically significant relationship.
+
+### Overall, the analysis suggests that:
+
+#### Median household income and total population are positively associated with the number of EVs in a county, while longer average travel times are associated with fewer EVs.
+#### The model seems to explain a significant portion of the variation in EV counts, but there might still be other factors at play.
+
+
+```{r}
+# Create scatter plots for each independent variable
+ev_mdot_data %>%
+  ggplot(aes(x = Median.Household.Income, y = Number.of.Vehicles)) +
+  geom_point() +
+  stat_smooth(method = lm, se = FALSE, linetype = "dashed") +
+  labs(title = "Number of EVs vs. Median Household Income", x = "Median Household Income", y = "Number of EVs") +
+  theme_bw()
+
+ev_mdot_data %>%
+  ggplot(aes(x = Total.Population, y = Number.of.Vehicles)) +
+  geom_point() +
+  stat_smooth(method = lm, se = FALSE, linetype = "dashed") +
+  labs(title = "Number of EVs vs. Total Population", x = "Total Population", y = "Number of EVs") +
+  theme_bw()
+
+ev_mdot_data %>%
+  ggplot(aes(x = Average.Travel.Time.to.Work, y = Number.of.Vehicles)) +
+  geom_point() +
+  stat_smooth(method = lm, se = FALSE, linetype = "dashed") +
+  labs(title = "Number of EVs vs. Average Travel Time", x = "Average Travel Time (min)", y = "Number of EVs") +
+  theme_bw()
+
+```
+
+### The above code creates three scatter plots, each showing the relationship between one of the independent variables and the number of EVs. The regression lines are overlaid to visualize the predicted trends.
+
+
+```{r}
+# Calculate and format correlation matrix
+correlations <- cor(ev_mdot_data[, c("Number.of.Vehicles", "Median.Household.Income", "Total.Population", "Average.Travel.Time.to.Work")], method = "spearman")
+correlations <- round(correlations, 2)
+diag(correlations) <- 0
+
+# Create heatmap
+library(corrplot)
+corrplot(correlations, type = "upper", method = "circle") # Show only upper triangle
+title("Correlations between EV Adoption Factors")
+
+```
+
